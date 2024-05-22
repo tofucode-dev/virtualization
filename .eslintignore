@@ -1,0 +1,14 @@
+package.json
+yarn.lock
+**/*.md
+*.md
+**/*.css
+*.css
+**/*.json
+*.json
+node_modules
+dist
+build
+coverage
+.eslintrc.*
+vite.config.*
