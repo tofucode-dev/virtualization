@@ -9,8 +9,6 @@ As part of this code submission we expect you to:
 
 The bare minimum expectation is that the code runs without crashes, and the parameters can be changed without causing any issues, while maintaining the intended functionality.
 
-In this review you only need to concern yourself with the code in `src/component-library/Virtualizer.tsx`, if you like you may also examine how it is called within `src/App.tsx`, however this is not required.
-
 Additionally, there are a few stretch goals you can aim for:
 
 1. Showcasing TypeScript skills by typing some components.
