@@ -10,11 +10,12 @@ As part of this code submission we expect you to:
 
 The bare minimum expectation is that the code runs without crashes, and the parameters can be changed without causing any issues, while maintaining the intended functionality.
 
-Additionally, there are a few stretch goals you can aim for:
+While not required and not impacting your chances of passing the interview, you may consider aiming for the following stretch goals:
 
 1. Showcasing TypeScript skills by typing some components.
 2. Adding unit tests.
 3. Styling one or more components.
+4. Implementing any other features or improvements you find interesting or important to explain/showcase.
 
 There are no wholly correct solutions we are looking for, rather we are keen to see your thought processes and engineering approach, you may rewrite/comment/critique/take notes in whatever way you find easiest that we can refer to in a group discussion after the fact.
 
