@@ -6,6 +6,7 @@ As part of this code submission we expect you to:
 
 1. Review and and understand what the code is intending to do.
 2. Identify and fix what is wrong.
+3. Ensure the code adheres to best practices in production-level code.
 
 The bare minimum expectation is that the code runs without crashes, and the parameters can be changed without causing any issues, while maintaining the intended functionality.
 
