@@ -1,7 +1,11 @@
 import React, { useCallback, useState } from "react";
 
+/*
+ type for the size of the rows and columns
+*/
+type DynamicSize = number | ((index: number) => number);
 
-const calculateTotalSize = (size: any, count: number) => {
+const calculateTotalSize = (size: DynamicSize, count: number) => {
   if (typeof size === "number") {
     return count * size;
   }
@@ -16,7 +20,7 @@ const calculateTotalSize = (size: any, count: number) => {
 };
 
 
-const checkNumberProp = (prop: any, fallback: number): number => {
+const checkNumberProp = (prop: unknown, fallback: number): number => {
   if (typeof prop === "number") {
     return prop;
   } else {
