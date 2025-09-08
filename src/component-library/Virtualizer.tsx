@@ -131,6 +131,12 @@ export const Virtualizer = React.memo<{
               .map((__, x) => {
                 const rowIndex = firstVisibleRow + y;
                 const columnIndex = firstVisibleColumn + x;
+
+                // Bounds checking: ensure we don't render cells outside the grid
+                if (rowIndex >= numRows || columnIndex >= numColumns) {
+                  return null;
+                }
+
                 const style: React.CSSProperties = {
                   position: "absolute",
                   top:
