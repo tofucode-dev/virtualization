@@ -78,10 +78,29 @@ export const Virtualizer = React.memo<{
   const totalHeight = calculateTotalSize(rowHeight, numRows);
   const totalWidth = calculateTotalSize(columnWidth, numColumns);
 
-  const [firstVisibleRow, setFirstVisibleRow] = useState(0);
-  const [lastVisibleRow, setLastVisibleRow] = useState(0);
-  const [firstVisibleColumn, setFirstVisibleColumn] = useState(0);
-  const [lastVisibleColumn, setLastVisibleColumn] = useState(0);
+
+  const calculateInitialVisibleRange = () => {
+    const avgRowHeight = typeof rowHeight === "number" 
+      ? rowHeight 
+      : totalHeight / numRows;
+    
+    const avgColumnWidth = typeof columnWidth === "number" 
+      ? columnWidth 
+      : totalWidth / numColumns;
+    
+    return {
+      firstRow: 0,            
+      lastRow: Math.floor(containerHeight / avgRowHeight),     
+      firstColumn: 0,                            
+      lastColumn: Math.floor(containerWidth / avgColumnWidth),
+    };
+  };
+
+  const initialRange = calculateInitialVisibleRange();
+  const [firstVisibleRow, setFirstVisibleRow] = useState(initialRange.firstRow);
+  const [lastVisibleRow, setLastVisibleRow] = useState(initialRange.lastRow);
+  const [firstVisibleColumn, setFirstVisibleColumn] = useState(initialRange.firstColumn);
+  const [lastVisibleColumn, setLastVisibleColumn] = useState(initialRange.lastColumn);
 
   const onScroll = useCallback<React.UIEventHandler<HTMLDivElement>>(
     ({ currentTarget }) => {
