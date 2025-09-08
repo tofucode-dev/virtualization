@@ -76,11 +76,22 @@ export const Virtualizer = React.memo<{
   const onScroll = useCallback<React.UIEventHandler<HTMLDivElement>>(
     ({ currentTarget }) => {
       const { scrollTop, scrollLeft } = currentTarget;
-      setFirstVisibleRow(Math.floor(scrollTop / rowHeight));
-      setLastVisibleRow(Math.floor((scrollTop + containerHeight) / rowHeight));
-      setFirstVisibleColumn(Math.floor(scrollLeft / columnWidth));
+
+      // Scroll calculations try to divide by functions instead of numbers (CRASHES!)
+      // Calculate average sizes for scroll calculations
+      const avgRowHeight =
+        typeof rowHeight === "number" ? rowHeight : totalHeight / numRows;
+
+      const avgColumnWidth =
+        typeof columnWidth === "number" ? columnWidth : totalWidth / numColumns;
+
+      setFirstVisibleRow(Math.floor(scrollTop / avgRowHeight));
+      setLastVisibleRow(
+        Math.floor((scrollTop + containerHeight) / avgRowHeight)
+      );
+      setFirstVisibleColumn(Math.floor(scrollLeft / avgColumnWidth));
       setLastVisibleColumn(
-        Math.floor((scrollLeft + containerWidth) / columnWidth)
+        Math.floor((scrollLeft + containerWidth) / avgColumnWidth)
       );
     },
     []
