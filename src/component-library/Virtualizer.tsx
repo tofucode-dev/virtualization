@@ -1,5 +1,21 @@
 import React, { useCallback, useState } from "react";
 
+
+const calculateTotalSize = (size: any, count: number) => {
+  if (typeof size === "number") {
+    return count * size;
+  }
+
+  // For dynamic sizes, sum up all individual sizes
+  let total = 0;
+  for (let i = 0; i < count; i++) {
+    total += size(i);
+  }
+
+  return total;
+};
+
+
 const checkNumberProp = (prop: any, fallback: number): number => {
   if (typeof prop === "number") {
     return prop;
@@ -55,18 +71,8 @@ export const Virtualizer = React.memo<{
   const containerWidth = checkNumberProp(props.containerWidth, 0);
   const children = checkFunctionProp(props.children, () => null);
 
-  const totalHeight =
-    typeof rowHeight === "number"
-      ? numRows * rowHeight
-      : new Array(numRows)
-          .fill(null)
-          .reduce<number>((acc, _, index) => acc + rowHeight(index), 0);
-  const totalWidth =
-    typeof columnWidth === "number"
-      ? numColumns * columnWidth
-      : new Array(numColumns)
-          .fill(null)
-          .reduce<number>((acc, _, index) => acc + columnWidth(index), 0);
+  const totalHeight = calculateTotalSize(rowHeight, numRows);
+  const totalWidth = calculateTotalSize(columnWidth, numColumns);
 
   const [firstVisibleRow, setFirstVisibleRow] = useState(0);
   const [lastVisibleRow, setLastVisibleRow] = useState(0);
