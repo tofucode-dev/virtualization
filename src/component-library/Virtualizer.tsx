@@ -69,21 +69,37 @@ export const Virtualizer = React.memo<{
           .fill(null)
           .reduce<number>((acc, _, index) => acc + columnWidth(index), 0);
 
-  const [firstVisibleRow, setFirstVisibleRow] = useState(0);
-  const [lastVisibleRow, setLastVisibleRow] = useState(0);
-  const [firstVisibleColumn, setFirstVisibleColumn] = useState(0);
-  const [lastVisibleColumn, setLastVisibleColumn] = useState(0);
+  // Calculate initial visible range
+  const avgRowHeight =
+    typeof rowHeight === "number" ? rowHeight : totalHeight / numRows;
+  const avgColumnWidth =
+    typeof columnWidth === "number" ? columnWidth : totalWidth / numColumns;
+
+  const initialFirstVisibleRow = 0;
+  const initialLastVisibleRow = Math.min(
+    Math.floor(containerHeight / avgRowHeight) + 1,
+    numRows - 1
+  );
+  const initialFirstVisibleColumn = 0;
+  const initialLastVisibleColumn = Math.min(
+    Math.floor(containerWidth / avgColumnWidth) + 1,
+    numColumns - 1
+  );
+
+  const [firstVisibleRow, setFirstVisibleRow] = useState(
+    initialFirstVisibleRow
+  );
+  const [lastVisibleRow, setLastVisibleRow] = useState(initialLastVisibleRow);
+  const [firstVisibleColumn, setFirstVisibleColumn] = useState(
+    initialFirstVisibleColumn
+  );
+  const [lastVisibleColumn, setLastVisibleColumn] = useState(
+    initialLastVisibleColumn
+  );
 
   const onScroll = useCallback<React.UIEventHandler<HTMLDivElement>>(
     ({ currentTarget }) => {
       const { scrollTop, scrollLeft } = currentTarget;
-
-      // Use average sizes for scroll calculations
-      const avgRowHeight =
-        typeof rowHeight === "number" ? rowHeight : totalHeight / numRows;
-
-      const avgColumnWidth =
-        typeof columnWidth === "number" ? columnWidth : totalWidth / numColumns;
 
       setFirstVisibleRow(Math.floor(scrollTop / avgRowHeight));
       setLastVisibleRow(
@@ -94,7 +110,7 @@ export const Virtualizer = React.memo<{
         Math.floor((scrollLeft + containerWidth) / avgColumnWidth)
       );
     },
-    [rowHeight, columnWidth, totalHeight, totalWidth, numRows, numColumns, containerHeight, containerWidth]
+    [avgRowHeight, avgColumnWidth, containerHeight, containerWidth]
   );
 
   return (
