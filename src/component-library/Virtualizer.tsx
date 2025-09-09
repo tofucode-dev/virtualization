@@ -2,11 +2,11 @@ import React, { useCallback, useState } from "react";
 
 // typeguards
 const isSizeFunction = (fn: unknown): fn is SizeFunction => {
-  return typeof fn === "function" && fn.length === 2; // This check would be enough for our use case
+  return typeof fn === "function" && fn.length === 1; // This check would be enough for our use case
   // for other use cases i.e checking between two different functions with same amount of parameters, might need to add more checks like branded types
 };
 const isRenderFunction = (fn: unknown): fn is RenderFunction => {
-  return typeof fn === "function" && fn.length === 3;
+  return typeof fn === "function" && fn.length === 1;
 };
 
 //TYPES
@@ -123,26 +123,13 @@ export const Virtualizer = React.memo<VirtualizerProps>(props => {
   const avgColumnWidth =
     typeof columnWidth === "number" ? columnWidth : totalWidth / numColumns;
 
-  const initialFirstVisibleRow = 0;
-  const initialLastVisibleRow = Math.min(
-    Math.floor(containerHeight / avgRowHeight) + 1,
-    numRows - 1
+  const [firstVisibleRow, setFirstVisibleRow] = useState(() => 0);
+  const [lastVisibleRow, setLastVisibleRow] = useState(() =>
+    Math.min(Math.floor(containerHeight / avgRowHeight) + 1, numRows - 1)
   );
-  const initialFirstVisibleColumn = 0;
-  const initialLastVisibleColumn = Math.min(
-    Math.floor(containerWidth / avgColumnWidth) + 1,
-    numColumns - 1
-  );
-
-  const [firstVisibleRow, setFirstVisibleRow] = useState(
-    initialFirstVisibleRow
-  );
-  const [lastVisibleRow, setLastVisibleRow] = useState(initialLastVisibleRow);
-  const [firstVisibleColumn, setFirstVisibleColumn] = useState(
-    initialFirstVisibleColumn
-  );
-  const [lastVisibleColumn, setLastVisibleColumn] = useState(
-    initialLastVisibleColumn
+  const [firstVisibleColumn, setFirstVisibleColumn] = useState(() => 0);
+  const [lastVisibleColumn, setLastVisibleColumn] = useState(() =>
+    Math.min(Math.floor(containerWidth / avgColumnWidth) + 1, numColumns - 1)
   );
 
   const onScroll = useCallback<React.UIEventHandler<HTMLDivElement>>(
@@ -161,6 +148,25 @@ export const Virtualizer = React.memo<VirtualizerProps>(props => {
     [avgRowHeight, avgColumnWidth, containerHeight, containerWidth]
   );
 
+  const renderCells = () => {
+    return new Array(lastVisibleRow + 1 - firstVisibleRow).fill(null).map((_, y) =>
+      new Array(lastVisibleColumn + 1 - firstVisibleColumn)
+        .fill(null)
+        .map((__, x) => {
+          const rowIndex = firstVisibleRow + y;
+          const columnIndex = firstVisibleColumn + x;
+          const style = createCellStyle(
+            rowIndex,
+            columnIndex,
+            rowHeight,
+            columnWidth
+          );
+
+          return children({ rowIndex, columnIndex, style });
+        })
+    );
+  };
+
   return (
     <div
       style={{
@@ -178,24 +184,7 @@ export const Virtualizer = React.memo<VirtualizerProps>(props => {
           overflow: "hidden",
         }}
       >
-        {new Array(lastVisibleRow + 1 - firstVisibleRow)
-          .fill(null)
-          .map((_, y) =>
-            new Array(lastVisibleColumn + 1 - firstVisibleColumn)
-              .fill(null)
-              .map((__, x) => {
-                const rowIndex = firstVisibleRow + y;
-                const columnIndex = firstVisibleColumn + x;
-                const style = createCellStyle(
-                  rowIndex,
-                  columnIndex,
-                  rowHeight,
-                  columnWidth
-                );
-
-                return children({ rowIndex, columnIndex, style });
-              })
-          )}
+        {renderCells()}
       </div>
     </div>
   );
