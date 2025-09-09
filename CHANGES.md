@@ -27,3 +27,9 @@ Virtualizer should be able to:
       - handle division by 0 issues
 3. There are missing dependecies in onScroll callback function causing lack of updates when values from user input change.
 4. Missing initial state: Visible range starts at 0 instead of calculated values
+
+## TYPESCRIPT IMPROVEMENTS
+
+1. Missing interfaces: No VirtualizerProps, CellInfo, SizeFunction interfaces
+2. Utility functions are missing proper typing
+3. Number checks are missing !isNaN and isFinite

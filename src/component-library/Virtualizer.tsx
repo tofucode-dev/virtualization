@@ -1,56 +1,78 @@
 import React, { useCallback, useState } from "react";
 
-const checkNumberProp = (prop: any, fallback: number): number => {
-  if (typeof prop === "number") {
-    return prop;
-  } else {
-    return fallback;
-  }
+// typeguards
+const isSizeFunction = (fn: unknown): fn is SizeFunction => {
+  return typeof fn === "function" && fn.length === 2; // This check would be enough for our use case
+  // for other use cases i.e checking between two different functions with same amount of parameters, might need to add more checks like branded types 
+};
+const isRenderFunction = (fn: unknown): fn is RenderFunction => {
+  return typeof fn === "function" && fn.length === 3;
 };
 
-const checkNumberOrFunctionProp = (
-  prop: any,
-  fallback: number
-): number | ((index: number) => number) => {
-  if (typeof prop === "number" || typeof prop === "function") {
-    return prop;
-  } else {
-    return fallback;
-  }
-};
+//TYPES
+interface SizeFunction {
+  (index: number): number;
+}
 
-const checkFunctionProp = (
-  prop: any,
-  fallback: () => null
-): ((info: {
+interface RenderFunction {
+  (info: CellInfo): JSX.Element | null; // Can be replaced with React.ReactNode for better React type compatibility
+}
+
+interface CellInfo {
   rowIndex: number;
   columnIndex: number;
   style: React.CSSProperties;
-}) => JSX.Element | null) => {
-  if (typeof prop === "function") {
+}
+
+interface VirtualizerProps {
+  numRows: number;
+  numColumns: number;
+  rowHeight: number | SizeFunction;
+  columnWidth: number | SizeFunction;
+  containerHeight: number;
+  containerWidth: number;
+  children: RenderFunction;
+}
+
+//HELPER FUNCTIONS
+const checkNumberProp = (prop: unknown, fallback: number): number => {
+  if (typeof prop === "number" && !isNaN(prop) && isFinite(prop)) {
+    return prop;
+  }
+
+  return fallback;
+};
+
+const checkNumberOrSizeFunctionProp = (
+  prop: unknown,
+  fallback: number
+): number | SizeFunction => {
+  if (typeof prop === "number" && !isNaN(prop) && isFinite(prop)) {
+    return prop;
+  }
+  if (isSizeFunction(prop)) {
+    return prop;
+  }
+
+  return fallback;
+};
+
+const checkFunctionProp = (
+  prop: unknown,
+  fallback: () => null
+): RenderFunction => {
+  if (isRenderFunction(prop)) {
     return prop;
   } else {
     return fallback;
   }
 };
 
-export const Virtualizer = React.memo<{
-  numRows: number;
-  numColumns: number;
-  rowHeight: number | ((index: number) => number);
-  columnWidth: number | ((index: number) => number);
-  containerHeight: number;
-  containerWidth: number;
-  children: (info: {
-    rowIndex: number;
-    columnIndex: number;
-    style: React.CSSProperties;
-  }) => JSX.Element | null;
-}>(props => {
+export const Virtualizer = React.memo<VirtualizerProps>(props => {
   const numRows = checkNumberProp(props.numRows, 0);
   const numColumns = checkNumberProp(props.numColumns, 0);
-  const rowHeight = checkNumberOrFunctionProp(props.rowHeight, 0);
-  const columnWidth = checkNumberOrFunctionProp(props.columnWidth, 0);
+  const rowHeight = checkNumberOrSizeFunctionProp(props.rowHeight, 0);
+  const columnWidth = checkNumberOrSizeFunctionProp(props.columnWidth, 0);
   const containerHeight = checkNumberProp(props.containerHeight, 0);
   const containerWidth = checkNumberProp(props.containerWidth, 0);
   const children = checkFunctionProp(props.children, () => null);
