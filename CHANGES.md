@@ -39,6 +39,21 @@ Virtualizer should be able to:
 
 1. Some of the functions could be extracted and be more generic
 2. render function inside component template is causing lack of readability
+3. Virtualizer has a lot of utils functions and state management. For better readability, maintanance, separation of concerns, testing it would be better to split component into smaller pieces, hooks i.e
+```
+src/
+├── component-library/
+│   ├── Virtualizer/
+│   │   ├── index.ts       
+│   │   └── Virtualizer.tsx
+│   └── index.ts           
+├── hooks/
+│   └── useVirtualizer.ts
+├── types/
+│   └── virtualizer.types.ts
+└── utils/
+    └── virtualizer-utils.ts
+```
 
 ## PERFORMANCE OPTIMIZATIONS
 
@@ -48,3 +63,6 @@ Virtualizer should be able to:
     - we can create render function as a useCallback in parent or write comparation function in React.memo to exclude checks for children
     - When checked in React DevTools Profiler rerenders in App.tsx are causing rerenders in Virtualizer because of `children` change.
 4. Just in case, because of big numbers like 50k, 100k rows/cols it would be good to memonize all calculated values. Although it might be a premature optimazation
+
+
+## 
