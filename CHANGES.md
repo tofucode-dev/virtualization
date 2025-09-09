@@ -25,3 +25,4 @@ Virtualizer should be able to:
       Possible improvements
       - Move avg calculation to useMemo value
       - handle division by 0 issues
+3. There are missing dependecies in onScroll callback function causing lack of updates when values from user input change
