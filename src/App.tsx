@@ -70,6 +70,15 @@ const App = () => {
     useNumberParameter(400);
   const [reset, setReset] = useState(false);
 
+  /**
+   * Memoized render function for individual cells in the virtualized grid.
+   *
+   * This function creates alternating colored cells with row:column labels.
+   * It's memoized to prevent unnecessary re-renders of the Virtualizer component.
+   *
+   * @param params - Cell information including indices and positioning styles
+   * @returns A styled Cell component with alternating background colors
+   */
   const renderCell = useCallback(
     ({
       rowIndex,

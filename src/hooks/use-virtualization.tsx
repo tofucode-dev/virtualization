@@ -1,8 +1,6 @@
 import { useCallback, useMemo, useState } from "react";
 
-import type {
-  VirtualizerProps,
-} from "../types/virtualization.types";
+import type { VirtualizerProps } from "../types/virtualization.types";
 import {
   calculateCumulativeSize,
   checkFunctionProp,
@@ -11,6 +9,9 @@ import {
   createCellStyle,
 } from "../utils/virtualization-utils";
 
+/**
+ * Return type for the useVirtualization hook.
+ */
 interface UseVirtualizationReturn {
   onScroll: React.UIEventHandler<HTMLDivElement>;
   totalHeight: number;
@@ -20,6 +21,34 @@ interface UseVirtualizationReturn {
   containerWidth: number;
 }
 
+/**
+ * Custom hook that manages virtualization logic for a grid component.
+ *
+ * This hook handles:
+ * - Prop validation and normalization
+ * - Total dimension calculations
+ * - Visible range state management
+ * - Scroll event handling
+ * - Cell rendering optimization
+ *
+ * @param props - The virtualizer configuration props
+ * @returns An object containing all necessary values and functions for virtualization
+ *
+ * @example
+ * ```tsx
+ * const { onScroll, totalHeight, totalWidth, renderCells } = useVirtualization({
+ *   numRows: 1000,
+ *   numColumns: 1000,
+ *   rowHeight: 50,
+ *   columnWidth: 100,
+ *   containerHeight: 400,
+ *   containerWidth: 400,
+ *   children: ({ rowIndex, columnIndex, style }) => (
+ *     <div style={style}>Cell {rowIndex}:{columnIndex}</div>
+ *   )
+ * });
+ * ```
+ */
 // Can be split into smaller pieces for better readability, testing, maintanance i.e useVisibleRange, useScrollHandler, useRenderCells
 export const useVirtualization = (
   props: VirtualizerProps
@@ -100,7 +129,7 @@ export const useVirtualization = (
       setFirstVisibleRow(newFirstRow);
       setLastVisibleRow(newLastRow);
       setFirstVisibleColumn(newFirstColumn);
-      setLastVisibleColumn(newLastColumn)
+      setLastVisibleColumn(newLastColumn);
     },
     [
       avgRowHeight,
@@ -108,7 +137,7 @@ export const useVirtualization = (
       containerHeight,
       containerWidth,
       numRows,
-      numColumns
+      numColumns,
     ]
   );
 
