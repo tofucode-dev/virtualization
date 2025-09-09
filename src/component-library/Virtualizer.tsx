@@ -114,10 +114,12 @@ export const Virtualizer = React.memo<VirtualizerProps>(props => {
   const containerWidth = checkNumberProp(props.containerWidth, 0);
   const children = checkFunctionProp(props.children, () => null);
 
+  // Only memoize if calculateCumulativeSize is actually expensive
   const totalHeight = calculateCumulativeSize(numRows, rowHeight);
   const totalWidth = calculateCumulativeSize(numColumns, columnWidth);
 
   // Calculate initial visible range
+  // Simple calculations - no memoization needed
   const avgRowHeight =
     typeof rowHeight === "number" ? rowHeight : totalHeight / numRows;
   const avgColumnWidth =
@@ -148,23 +150,40 @@ export const Virtualizer = React.memo<VirtualizerProps>(props => {
     [avgRowHeight, avgColumnWidth, containerHeight, containerWidth]
   );
 
+  // No useCallback needed - just call directly in JSX
   const renderCells = () => {
-    return new Array(lastVisibleRow + 1 - firstVisibleRow).fill(null).map((_, y) =>
-      new Array(lastVisibleColumn + 1 - firstVisibleColumn)
-        .fill(null)
-        .map((__, x) => {
-          const rowIndex = firstVisibleRow + y;
-          const columnIndex = firstVisibleColumn + x;
-          const style = createCellStyle(
-            rowIndex,
-            columnIndex,
-            rowHeight,
-            columnWidth
-          );
+    // Refactor to flat array:
+    // Flat array is more efficient for React's reconciliation
+    // Removed unnecessary array creation and nested operations - new Array(size).fill(null).map((__, x) => {})
+    // Added key to each cell
+    // Simplified the loop structure for better readability
+    const cells = [];
 
-          return children({ rowIndex, columnIndex, style });
-        })
-    );
+    for (
+      let rowIndex = firstVisibleRow;
+      rowIndex <= lastVisibleRow;
+      rowIndex++
+    ) {
+      for (
+        let columnIndex = firstVisibleColumn;
+        columnIndex <= lastVisibleColumn;
+        columnIndex++
+      ) {
+        const style = createCellStyle(
+          rowIndex,
+          columnIndex,
+          rowHeight,
+          columnWidth
+        );
+        const key = `${rowIndex}-${columnIndex}`;
+
+        cells.push(
+          <div key={key}>{children({ rowIndex, columnIndex, style })}</div>
+        );
+      }
+    }
+
+    return cells;
   };
 
   return (

@@ -38,3 +38,7 @@ Virtualizer should be able to:
 ## CODE QUALITY & READABILITY
 
 1. Some of the functions could be extracted and be more generic
+2. render function inside component template is causing lack of readability
+
+## PERFORMANCE OPTIMIZATIONS
+
