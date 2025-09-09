@@ -68,10 +68,43 @@ const App = () => {
     useNumberParameter(400);
   const [containerWidthInput, containerWidth, onChangeContainerWidth] =
     useNumberParameter(400);
+  const [reset, setReset] = useState(false);
+
+  const renderCell = useCallback(
+    ({
+      rowIndex,
+      columnIndex,
+      style,
+    }: {
+      rowIndex: number;
+      columnIndex: number;
+      style: React.CSSProperties;
+    }) => (
+      <Cell
+        key={`${rowIndex}-${columnIndex}`}
+        style={style}
+        backgroundColor={
+          (rowIndex + (columnIndex % 2)) % 2 === 0 ? "aliceblue" : "white"
+        }
+      >
+        <p style={{ color: "black" }}>
+          {rowIndex}:{columnIndex}
+        </p>
+      </Cell>
+    ),
+    []
+  );
 
   return (
     <Container>
       <h1>A Simple Virtualizer</h1>
+      <button
+        onClick={() => {
+          setReset(prev => !prev);
+        }}
+      >
+        {reset ? "!Force Render" : "Force Render!"}
+      </button>
       <ParametersContainer>
         <TextField
           label="Num Rows"
@@ -112,19 +145,7 @@ const App = () => {
         containerHeight={containerHeight}
         containerWidth={containerWidth}
       >
-        {({ rowIndex, columnIndex, style }) => (
-          <Cell
-            key={`${rowIndex}-${columnIndex}`}
-            style={style}
-            backgroundColor={
-              (rowIndex + (columnIndex % 2)) % 2 === 0 ? "aliceblue" : "white"
-            }
-          >
-            <p>
-              {rowIndex}:{columnIndex}
-            </p>
-          </Cell>
-        )}
+        {renderCell}
       </Virtualizer>
     </Container>
   );

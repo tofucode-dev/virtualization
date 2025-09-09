@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 
 // typeguards
 const isSizeFunction = (fn: unknown): fn is SizeFunction => {
@@ -114,16 +114,36 @@ export const Virtualizer = React.memo<VirtualizerProps>(props => {
   const containerWidth = checkNumberProp(props.containerWidth, 0);
   const children = checkFunctionProp(props.children, () => null);
 
-  // Only memoize if calculateCumulativeSize is actually expensive
-  const totalHeight = calculateCumulativeSize(numRows, rowHeight);
-  const totalWidth = calculateCumulativeSize(numColumns, columnWidth);
+  // Memoize expensive calculations - not that importantn for small grids. 
+  const totalHeight = useMemo(
+    () => calculateCumulativeSize(numRows, rowHeight),
+    [numRows, rowHeight]
+  );
+  const totalWidth = useMemo(
+    () => calculateCumulativeSize(numColumns, columnWidth),
+    [numColumns, columnWidth]
+  );
 
   // Calculate initial visible range
-  // Simple calculations - no memoization needed
-  const avgRowHeight =
-    typeof rowHeight === "number" ? rowHeight : totalHeight / numRows;
-  const avgColumnWidth =
-    typeof columnWidth === "number" ? columnWidth : totalWidth / numColumns;
+  const avgRowHeight = useMemo(
+    () =>
+      typeof rowHeight === "number"
+        ? rowHeight
+        : numRows > 0
+          ? totalHeight / numRows
+          : 0,
+    [rowHeight, totalHeight, numRows]
+  );
+
+  const avgColumnWidth = useMemo(
+    () =>
+      typeof columnWidth === "number"
+        ? columnWidth
+        : numColumns > 0
+          ? totalWidth / numColumns
+          : 0,
+    [columnWidth, totalWidth, numColumns]
+  );
 
   const [firstVisibleRow, setFirstVisibleRow] = useState(() => 0);
   const [lastVisibleRow, setLastVisibleRow] = useState(() =>
@@ -150,8 +170,7 @@ export const Virtualizer = React.memo<VirtualizerProps>(props => {
     [avgRowHeight, avgColumnWidth, containerHeight, containerWidth]
   );
 
-  // No useCallback needed - just call directly in JSX
-  const renderCells = () => {
+  const renderCells = useCallback(() => {
     // Refactor to flat array:
     // Flat array is more efficient for React's reconciliation
     // Removed unnecessary array creation and nested operations - new Array(size).fill(null).map((__, x) => {})
@@ -184,7 +203,15 @@ export const Virtualizer = React.memo<VirtualizerProps>(props => {
     }
 
     return cells;
-  };
+  }, [
+    firstVisibleRow,
+    lastVisibleRow,
+    firstVisibleColumn,
+    lastVisibleColumn,
+    rowHeight,
+    columnWidth,
+    children,
+  ]);
 
   return (
     <div

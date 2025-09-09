@@ -42,3 +42,9 @@ Virtualizer should be able to:
 
 ## PERFORMANCE OPTIMIZATIONS
 
+1. I try not to create premature optimization. No need for useMemo or useCallback if calculations are not complex.
+2. renderCell function is creating nested array [[], [], []] in the end React will need to flatten this array so it is better to use flat array to render. Also there is no need to create temporary array and fill with nulls and then map.
+3. React.memo in that case is unnecessary because rerendering is driven by parent the render function will change on every parent rerender causing rerender of Virtualizer
+    - we can create render function as a useCallback in parent or write comparation function in React.memo to exclude checks for children
+    - When checked in React DevTools Profiler rerenders in App.tsx are causing rerenders in Virtualizer because of `children` change.
+4. Just in case, because of big numbers like 50k, 100k rows/cols it would be good to memonize all calculated values. Although it might be a premature optimazation
