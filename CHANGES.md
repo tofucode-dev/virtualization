@@ -33,3 +33,8 @@ Virtualizer should be able to:
 1. Missing interfaces: No VirtualizerProps, CellInfo, SizeFunction interfaces
 2. Utility functions are missing proper typing
 3. Number checks are missing !isNaN and isFinite
+
+
+## CODE QUALITY & READABILITY
+
+1. Some of the functions could be extracted and be more generic

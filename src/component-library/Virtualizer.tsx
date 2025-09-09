@@ -3,7 +3,7 @@ import React, { useCallback, useState } from "react";
 // typeguards
 const isSizeFunction = (fn: unknown): fn is SizeFunction => {
   return typeof fn === "function" && fn.length === 2; // This check would be enough for our use case
-  // for other use cases i.e checking between two different functions with same amount of parameters, might need to add more checks like branded types 
+  // for other use cases i.e checking between two different functions with same amount of parameters, might need to add more checks like branded types
 };
 const isRenderFunction = (fn: unknown): fn is RenderFunction => {
   return typeof fn === "function" && fn.length === 3;
@@ -43,6 +43,43 @@ const checkNumberProp = (prop: unknown, fallback: number): number => {
   return fallback;
 };
 
+const calculateCumulativeSize = (
+  count: number,
+  size: number | SizeFunction,
+  startIndex: number = 0
+): number => {
+  if (typeof size === "number") {
+    return count * size;
+  }
+
+  return new Array(count)
+    .fill(null)
+    .reduce<number>((acc, _, index) => acc + size(startIndex + index), 0);
+};
+
+const createCellStyle = (
+  rowIndex: number,
+  columnIndex: number,
+  rowHeight: number | SizeFunction,
+  columnWidth: number | SizeFunction
+): React.CSSProperties => {
+  const top = calculateCumulativeSize(rowIndex, rowHeight);
+  const left = calculateCumulativeSize(columnIndex, columnWidth);
+
+  const height =
+    typeof rowHeight === "number" ? rowHeight : rowHeight(rowIndex);
+  const width =
+    typeof columnWidth === "number" ? columnWidth : columnWidth(columnIndex);
+
+  return {
+    position: "absolute",
+    top,
+    left,
+    height,
+    width,
+  };
+};
+
 const checkNumberOrSizeFunctionProp = (
   prop: unknown,
   fallback: number
@@ -77,19 +114,8 @@ export const Virtualizer = React.memo<VirtualizerProps>(props => {
   const containerWidth = checkNumberProp(props.containerWidth, 0);
   const children = checkFunctionProp(props.children, () => null);
 
-  const totalHeight =
-    typeof rowHeight === "number"
-      ? numRows * rowHeight
-      : new Array(numRows)
-          .fill(null)
-          .reduce<number>((acc, _, index) => acc + rowHeight(index), 0);
-
-  const totalWidth =
-    typeof columnWidth === "number"
-      ? numColumns * columnWidth
-      : new Array(numColumns)
-          .fill(null)
-          .reduce<number>((acc, _, index) => acc + columnWidth(index), 0);
+  const totalHeight = calculateCumulativeSize(numRows, rowHeight);
+  const totalWidth = calculateCumulativeSize(numColumns, columnWidth);
 
   // Calculate initial visible range
   const avgRowHeight =
@@ -160,35 +186,12 @@ export const Virtualizer = React.memo<VirtualizerProps>(props => {
               .map((__, x) => {
                 const rowIndex = firstVisibleRow + y;
                 const columnIndex = firstVisibleColumn + x;
-                const style: React.CSSProperties = {
-                  position: "absolute",
-                  top:
-                    typeof rowHeight === "number"
-                      ? rowIndex * rowHeight
-                      : new Array(rowIndex)
-                          .fill(null)
-                          .reduce<number>(
-                            (acc, cur, index) => acc + rowHeight(index),
-                            0
-                          ),
-                  left:
-                    typeof columnWidth === "number"
-                      ? columnIndex * columnWidth
-                      : new Array(columnIndex)
-                          .fill(null)
-                          .reduce<number>(
-                            (acc, cur, index) => acc + columnWidth(index),
-                            0
-                          ),
-                  height:
-                    typeof rowHeight === "number"
-                      ? rowHeight
-                      : rowHeight(rowIndex),
-                  width:
-                    typeof columnWidth === "number"
-                      ? columnWidth
-                      : columnWidth(columnIndex),
-                };
+                const style = createCellStyle(
+                  rowIndex,
+                  columnIndex,
+                  rowHeight,
+                  columnWidth
+                );
 
                 return children({ rowIndex, columnIndex, style });
               })
