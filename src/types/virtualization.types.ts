@@ -2,54 +2,110 @@
  * Type definitions for the virtualization system.
  */
 
-/**
- * Function type for calculating dynamic sizes based on index.
- * 
- * @param index - The index of the item
- * @returns The size for the item at the given index
- */
-export interface SizeFunction {
-  (index: number): number;
-}
+// ============================================================================
+// CORE FUNCTION TYPES
+// ============================================================================
 
-/**
- * Function type for rendering individual cells in the virtualized grid.
- * 
- * @param info - Information about the cell to render
- * @returns JSX element or null for the cell
- */
-export interface RenderFunction {
-  (info: CellInfo): JSX.Element | null; // Can be replaced with React.ReactNode for better React type compatibility
-}
+/** Function for calculating dynamic sizes based on index. */
+export type SizeFunction = (index: number) => number;
 
-/**
- * Information passed to the render function for each cell.
- */
+/** Information passed to the render function for each cell. */
 export interface CellInfo {
-  /** The row index of the cell */
   rowIndex: number;
-  /** The column index of the cell */
   columnIndex: number;
-  /** CSS styles for positioning the cell */
+  /** CSS styles for absolute positioning and sizing */
   style: React.CSSProperties;
 }
 
-/**
- * Props for the Virtualizer component.
- */
+/** Function for rendering individual cells. Returns React nodes. */
+export type RenderFunction = (info: CellInfo) => React.ReactNode;
+
+/** Size value - either fixed number or dynamic function. */
+export type Size = number | SizeFunction;
+
+// ============================================================================
+// COMPONENT PROPS
+// ============================================================================
+
+/** Raw input props for the Virtualizer component. */
 export interface VirtualizerProps {
-  /** Number of rows in the grid */
   numRows: number;
-  /** Number of columns in the grid */
   numColumns: number;
-  /** Height of each row (fixed) or function to calculate height per row */
-  rowHeight: number | SizeFunction;
-  /** Width of each column (fixed) or function to calculate width per column */
-  columnWidth: number | SizeFunction;
-  /** Height of the container viewport */
+  rowHeight: Size;
+  columnWidth: Size;
   containerHeight: number;
-  /** Width of the container viewport */
   containerWidth: number;
-  /** Function to render each cell */
   children: RenderFunction;
+}
+
+/** Validated props with guaranteed safe values for virtualization. */
+export interface ValidatedVirtualizerProps {
+  numRows: number;
+  numColumns: number;
+  rowHeight: Size;
+  columnWidth: Size;
+  containerHeight: number;
+  containerWidth: number;
+  children: RenderFunction;
+}
+
+// ============================================================================
+// DATA STRUCTURES
+// ============================================================================
+
+/** Range of currently visible cells (indices are inclusive and 0-based). */
+export interface VisibleRange {
+  firstRow: number;
+  lastRow: number;
+  firstColumn: number;
+  lastColumn: number;
+}
+
+/** Calculated dimensions and metrics for virtualization. */
+export interface VirtualizationDimensions {
+  totalHeight: number;
+  totalWidth: number;
+  /** Used for scroll position calculations */
+  avgRowHeight: number;
+  /** Used for scroll position calculations */
+  avgColumnWidth: number;
+}
+
+// ============================================================================
+// HOOK RETURN TYPES
+// ============================================================================
+
+/** Main virtualization hook return type. */
+export interface UseVirtualizationReturn {
+  onScroll: React.UIEventHandler<HTMLDivElement>;
+  totalHeight: number;
+  totalWidth: number;
+  renderCells: () => React.ReactNode[];
+  containerHeight: number;
+  containerWidth: number;
+}
+
+/** Manages visible range state and scroll handling. */
+export interface VisibleRangeManager {
+  range: VisibleRange;
+  setRange: (range: VisibleRange) => void;
+  onScroll: React.UIEventHandler<HTMLDivElement>;
+}
+
+/** Cell rendering hook return type. */
+export interface UseRenderCellsReturn {
+  (): React.ReactNode[];
+}
+
+// ============================================================================
+// UTILITY TYPES
+// ============================================================================
+
+/** Partial visible range for updates. */
+export type VisibleRangeUpdate = Partial<VisibleRange>;
+
+/** Cell coordinates in the grid. */
+export interface CellCoordinates {
+  rowIndex: number;
+  columnIndex: number;
 }

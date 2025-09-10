@@ -54,6 +54,7 @@ src/
 └── utils/
     └── virtualizer-utils.ts
 ```
+4. Split use-virtualization into more - granual single responsibility hooks
 
 ## PERFORMANCE OPTIMIZATIONS
 
@@ -65,4 +66,9 @@ src/
 4. Just in case, because of big numbers like 50k, 100k rows/cols it would be good to memonize all calculated values. Although it might be a premature optimazation
 
 
-## 
+## POSSIBLE IMPROVEMENTS
+
+
+## POSSIBLE PROBLEMS
+
+1. For dynamic row/col size usinng average size to calculate visible elements can be inaccurate expecialy when there is a high variance i.e [10, 200,  15, 300, 20]. 
