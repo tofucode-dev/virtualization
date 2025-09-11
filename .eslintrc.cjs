@@ -141,6 +141,8 @@ const rules = {
         "**/babel.config.js",
         "**/jest.config.js",
         "**/vite.config.ts",
+        "**/vitest.config.ts",
+        "**/test-setup.ts",
         "**/vite/**",
         "**/test-utils/**",
       ],
