@@ -157,7 +157,7 @@ export const createCellStyle = (
  * @returns A valid number or the fallback value
  */
 export const checkNumberProp = (prop: unknown, fallback: number): number => {
-  if (typeof prop === "number" && !isNaN(prop) && isFinite(prop)) {
+  if (typeof prop === "number" && !isNaN(prop) && isFinite(prop) && prop >= 0) {
     return prop;
   }
 
@@ -175,7 +175,7 @@ export const checkNumberOrSizeFunctionProp = (
   prop: unknown,
   fallback: number
 ): number | SizeFunction => {
-  if (typeof prop === "number" && !isNaN(prop) && isFinite(prop)) {
+  if (typeof prop === "number" && !isNaN(prop) && isFinite(prop) && prop >= 0) {
     return prop;
   }
   if (isSizeFunction(prop)) {
