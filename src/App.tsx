@@ -23,19 +23,6 @@ const ParametersContainer = styled.div`
   margin-bottom: 8px;
 `;
 
-const Cell = styled(
-  React.forwardRef<
-    HTMLDivElement,
-    React.ComponentProps<"div"> & { backgroundColor: string }
-  >(({ backgroundColor, ...props }, ref) => <div ref={ref} {...props} />)
-)`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  background-color: ${({ backgroundColor }) => backgroundColor};
-`;
-
 const useNumberParameter = (
   initialValue: number
 ): [
@@ -76,6 +63,7 @@ const App = () => {
     overscanColumnCount,
     onChangeOverscanColumnCount,
   ] = useNumberParameter(1);
+
   const [reset, setReset] = useState(false);
 
   /**
@@ -89,17 +77,22 @@ const App = () => {
    */
   const renderCell = useCallback(
     ({ rowIndex, columnIndex, style, key }: CellInfo) => (
-      <Cell
+      <div
         key={key}
-        style={style}
-        backgroundColor={
-          (rowIndex + (columnIndex % 2)) % 2 === 0 ? "aliceblue" : "white"
-        }
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          textAlign: "center",
+          backgroundColor:
+            (rowIndex + (columnIndex % 2)) % 2 === 0 ? "aliceblue" : "white",
+          ...style,
+        }}
       >
-        <p style={{ color: "black" }}>
+        <span style={{ color: "black", fontSize: "14px" }}>
           {rowIndex}:{columnIndex}
-        </p>
-      </Cell>
+        </span>
+      </div>
     ),
     []
   );

@@ -70,6 +70,7 @@ src/
 
 1. Add Error boundries
 2. Handle Extreme values Edge cases
+3. (perf) Replace styled components with somethin tailwind based like shadcn/radixui for better performance since styled components is not staticly generated
 
 ## POSSIBLE PROBLEMS
 
@@ -94,10 +95,11 @@ It will take some time to think through and implement so im keeping the current 
 ## Missing features
 
 1. ~~**No Overscan**: No buffer rows/columns for smoother scrolling~~
-2. **No Loading States**: No handling for dynamic content loading
+2. **No Loading States**: No handling for dynamic content loading great with a small debounce of on scroll event. 
 3. **Metrics**: For debuging puproses it would be good to see metrics of number of rendered cells / time it took to render cell etc.
 4. **Unit Tests**: Add Unit tests for most important features 
 
 ## Logic fixes
 
 1. There was an issue where after updating row/col number value the scroll was not adjusting its position. 
+2. Cell definition in App.tsx is using forwardRef while it is not actually used since Cell is just a div.
