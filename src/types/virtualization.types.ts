@@ -15,6 +15,8 @@ export interface CellInfo {
   columnIndex: number;
   /** CSS styles for absolute positioning and sizing */
   style: React.CSSProperties;
+  /** Key for the cell */
+  key: string | number;
 }
 
 /** Function for rendering individual cells. Returns React nodes. */

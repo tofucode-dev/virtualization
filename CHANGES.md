@@ -72,3 +72,19 @@ src/
 ## POSSIBLE PROBLEMS
 
 1. For dynamic row/col size usinng average size to calculate visible elements can be inaccurate expecialy when there is a high variance i.e [10, 200,  15, 300, 20]. 
+2. For current implementation there is an issue with max browser rendering dimensions. If you provide huge numbers, browser wont be able to render them and will stop in somepoint i.e 32M px for Chrome. The issue is in:
+
+```
+<div
+        style={{
+          position: "relative",
+          height: totalHeight,
+          width: totalWidth,
+          overflow: "hidden",
+        }}
+      >
+...      
+```
+
+Possible fix is to change logic to that container. Instead of using set height and width keep the size as max and generate content inside relative to the actual values / container viewport. 
+It will take some time to think through and implement so im keeping the current solution with viewport relative content 

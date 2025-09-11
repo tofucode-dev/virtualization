@@ -42,7 +42,7 @@ export const useRenderCells = (
         );
         const key = `${rowIndex}-${columnIndex}`;
         cells.push(
-          <div key={key}>{children({ rowIndex, columnIndex, style })}</div>
+          children({ rowIndex, columnIndex, style, key })
         );
       }
     }

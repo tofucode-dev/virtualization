@@ -4,6 +4,7 @@ import styled from "styled-components";
 
 import { TextField } from "./TextField";
 import { Virtualizer } from "./component-library";
+import { CellInfo } from "./types/virtualization.types";
 
 const Container = styled.div`
   min-height: 100vh;
@@ -84,13 +85,10 @@ const App = () => {
       rowIndex,
       columnIndex,
       style,
-    }: {
-      rowIndex: number;
-      columnIndex: number;
-      style: React.CSSProperties;
-    }) => (
+      key,
+    }: CellInfo) => (
       <Cell
-        key={`${rowIndex}-${columnIndex}`}
+        key={key}
         style={style}
         backgroundColor={
           (rowIndex + (columnIndex % 2)) % 2 === 0 ? "aliceblue" : "white"
