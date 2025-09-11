@@ -1,4 +1,4 @@
-import { useCallback } from "react";
+import { useCallback, useMemo } from "react";
 
 import {
   SizeFunction,
@@ -22,6 +22,32 @@ export const useRenderCells = (
   columnWidth: number | SizeFunction,
   children: VirtualizerProps["children"]
 ): UseRenderCellsReturn => {
+  // Memoize cell styles to avoid recalculating on every render
+  const cellStyles = useMemo(() => {
+    const styles = new Map<string, React.CSSProperties>();
+
+    for (let rowIndex = range.firstRow; rowIndex <= range.lastRow; rowIndex++) {
+      for (
+        let columnIndex = range.firstColumn;
+        columnIndex <= range.lastColumn;
+        columnIndex++
+      ) {
+        const key = `${rowIndex}-${columnIndex}`;
+        const style = createCellStyle(
+          rowIndex,
+          columnIndex,
+          range.firstRow,
+          range.firstColumn,
+          rowHeight,
+          columnWidth
+        );
+        styles.set(key, style);
+      }
+    }
+
+    return styles;
+  }, [range, rowHeight, columnWidth]);
+
   return useCallback(() => {
     const cells: React.ReactNode[] = [];
 
@@ -31,18 +57,15 @@ export const useRenderCells = (
         columnIndex <= range.lastColumn;
         columnIndex++
       ) {
-        try {
-          // Use viewport-relative positioning to eliminate browser limits
-          const style = createCellStyle(
-            rowIndex,
-            columnIndex,
-            range.firstRow,
-            range.firstColumn,
-            rowHeight,
-            columnWidth
-          );
-          const key = `${rowIndex}-${columnIndex}`;
+        const key = `${rowIndex}-${columnIndex}`;
+        const style = cellStyles.get(key);
 
+        if (!style) {
+          console.warn(`Missing style for cell ${key}`);
+          continue;
+        }
+
+        try {
           // Safely call the user's render function
           const cell = children({ rowIndex, columnIndex, style, key });
           cells.push(cell);
@@ -52,21 +75,12 @@ export const useRenderCells = (
             `Error rendering cell at ${rowIndex}:${columnIndex}:`,
             error
           );
-          const key = `${rowIndex}-${columnIndex}`;
-          const fallbackStyle = createCellStyle(
-            rowIndex,
-            columnIndex,
-            range.firstRow,
-            range.firstColumn,
-            rowHeight,
-            columnWidth
-          );
 
           cells.push(
             <div
               key={key}
               style={{
-                ...fallbackStyle,
+                ...style,
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
@@ -84,5 +98,5 @@ export const useRenderCells = (
     }
 
     return cells;
-  }, [range, rowHeight, columnWidth, children]);
+  }, [range, cellStyles, children]);
 };
