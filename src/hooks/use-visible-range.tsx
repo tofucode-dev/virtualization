@@ -48,11 +48,14 @@ export const useVisibleRange = (
 
     return {
       firstRow: Math.max(0, 0 - overscanRowCount),
-      lastRow: Math.min(numRows - 1, visibleRows - 1 + overscanRowCount),
+      lastRow: Math.max(
+        0,
+        Math.min(numRows - 1, visibleRows - 1 + overscanRowCount)
+      ),
       firstColumn: Math.max(0, 0 - overscanColumnCount),
-      lastColumn: Math.min(
-        numColumns - 1,
-        visibleColumns - 1 + overscanColumnCount
+      lastColumn: Math.max(
+        0,
+        Math.min(numColumns - 1, visibleColumns - 1 + overscanColumnCount)
       ),
     };
   });
@@ -75,11 +78,14 @@ export const useVisibleRange = (
       // Apply overscan with bounds checking
       setRange({
         firstRow: Math.max(0, firstVisibleRow - overscanRowCount),
-        lastRow: Math.min(numRows - 1, lastVisibleRow + overscanRowCount),
+        lastRow: Math.max(
+          0,
+          Math.min(numRows - 1, lastVisibleRow + overscanRowCount)
+        ),
         firstColumn: Math.max(0, firstVisibleColumn - overscanColumnCount),
-        lastColumn: Math.min(
-          numColumns - 1,
-          lastVisibleColumn + overscanColumnCount
+        lastColumn: Math.max(
+          0,
+          Math.min(numColumns - 1, lastVisibleColumn + overscanColumnCount)
         ),
       });
     }
@@ -155,12 +161,21 @@ export const useVisibleRange = (
 
       // Apply overscan
       setRange({
-        firstRow: Math.max(0, firstVisibleRow - overscanRowCount),
-        lastRow: Math.min(numRows - 1, lastVisibleRow + overscanRowCount),
-        firstColumn: Math.max(0, firstVisibleColumn - overscanColumnCount),
-        lastColumn: Math.min(
-          numColumns - 1,
-          lastVisibleColumn + overscanColumnCount
+        firstRow: Math.max(
+          0,
+          Math.min(numRows - 1, firstVisibleRow - overscanRowCount)
+        ),
+        lastRow: Math.max(
+          0,
+          Math.min(numRows - 1, lastVisibleRow + overscanRowCount)
+        ),
+        firstColumn: Math.max(
+          0,
+          Math.min(numColumns - 1, firstVisibleColumn - overscanColumnCount)
+        ),
+        lastColumn: Math.max(
+          0,
+          Math.min(numColumns - 1, lastVisibleColumn + overscanColumnCount)
         ),
       });
     },
