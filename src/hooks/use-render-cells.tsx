@@ -31,19 +31,55 @@ export const useRenderCells = (
         columnIndex <= range.lastColumn;
         columnIndex++
       ) {
-        // Use viewport-relative positioning to eliminate browser limits
-        const style = createCellStyle(
-          rowIndex,
-          columnIndex,
-          range.firstRow,
-          range.firstColumn,
-          rowHeight,
-          columnWidth
-        );
-        const key = `${rowIndex}-${columnIndex}`;
-        cells.push(
-          children({ rowIndex, columnIndex, style, key })
-        );
+        try {
+          // Use viewport-relative positioning to eliminate browser limits
+          const style = createCellStyle(
+            rowIndex,
+            columnIndex,
+            range.firstRow,
+            range.firstColumn,
+            rowHeight,
+            columnWidth
+          );
+          const key = `${rowIndex}-${columnIndex}`;
+
+          // Safely call the user's render function
+          const cell = children({ rowIndex, columnIndex, style, key });
+          cells.push(cell);
+        } catch (error) {
+          // If user's render function throws an error, render a fallback cell
+          console.warn(
+            `Error rendering cell at ${rowIndex}:${columnIndex}:`,
+            error
+          );
+          const key = `${rowIndex}-${columnIndex}`;
+          const fallbackStyle = createCellStyle(
+            rowIndex,
+            columnIndex,
+            range.firstRow,
+            range.firstColumn,
+            rowHeight,
+            columnWidth
+          );
+
+          cells.push(
+            <div
+              key={key}
+              style={{
+                ...fallbackStyle,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                backgroundColor: "#ffebee",
+                color: "#c62828",
+                fontSize: "12px",
+                border: "1px solid #ffcdd2",
+              }}
+            >
+              Error
+            </div>
+          );
+        }
       }
     }
 

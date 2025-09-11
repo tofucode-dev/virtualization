@@ -81,12 +81,7 @@ const App = () => {
    * @returns A styled Cell component with alternating background colors
    */
   const renderCell = useCallback(
-    ({
-      rowIndex,
-      columnIndex,
-      style,
-      key,
-    }: CellInfo) => (
+    ({ rowIndex, columnIndex, style, key }: CellInfo) => (
       <Cell
         key={key}
         style={style}

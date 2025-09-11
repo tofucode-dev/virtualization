@@ -68,6 +68,8 @@ src/
 
 ## POSSIBLE IMPROVEMENTS
 
+1. Add Error boundries
+2. Handle Extreme values Edge cases
 
 ## POSSIBLE PROBLEMS
 
@@ -88,3 +90,10 @@ src/
 
 Possible fix is to change logic to that container. Instead of using set height and width keep the size as max and generate content inside relative to the actual values / container viewport. 
 It will take some time to think through and implement so im keeping the current solution with viewport relative content 
+
+## Missing features
+
+1. **No Overscan**: No buffer rows/columns for smoother scrolling
+2. **No Loading States**: No handling for dynamic content loading
+3. **Metrics**: For debuging puproses it would be good to see metrics of number of rendered cells / time it took to render cell etc.
+4. **Unit Tests**: Add Unit tests for most important features 

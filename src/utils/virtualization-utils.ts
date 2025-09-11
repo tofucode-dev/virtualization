@@ -35,10 +35,64 @@ export const calculateCumulativeSize = (
   // For dynamic sizes, use a more efficient loop instead of array operations
   let total = 0;
   for (let i = 0; i < count; i++) {
-    total += size(startIndex + i);
+    const itemSize = calculateSafeSize(size, startIndex + i, 0, "size");
+    total += itemSize;
   }
 
   return total;
+};
+
+/**
+ * Safely calculates a size value with error handling and validation.
+ *
+ * This function handles both fixed sizes (numbers) and dynamic sizes (functions),
+ * providing robust error handling and fallback values for invalid results.
+ *
+ * @param size - Either a fixed size (number) or a function that returns size for the given index
+ * @param index - The index to calculate size for
+ * @param fallback - The fallback value to use if calculation fails or returns invalid result
+ * @param dimension - The dimension name for error logging ("height", "width", or "size")
+ * @returns A valid size value or the fallback value
+ *
+ * @example
+ * ```typescript
+ * // Fixed size
+ * calculateSafeSize(50, 0, 50, "height") // Returns 50
+ *
+ * // Dynamic size function
+ * calculateSafeSize((index) => index * 10, 2, 50, "height") // Returns 20
+ *
+ * // Error handling
+ * calculateSafeSize((index) => { throw new Error("Bad function"); }, 1, 50, "height") // Returns 50
+ * ```
+ */
+export const calculateSafeSize = (
+  size: number | SizeFunction,
+  index: number,
+  fallback: number,
+  dimension: "height" | "width" | "size"
+): number => {
+  try {
+    const calculatedSize = typeof size === "number" ? size : size(index);
+
+    // Validate the calculated size
+    if (
+      typeof calculatedSize !== "number" ||
+      isNaN(calculatedSize) ||
+      !isFinite(calculatedSize) ||
+      calculatedSize < 0
+    ) {
+      console.warn(`Invalid ${dimension} at index ${index}: ${calculatedSize}`);
+
+      return fallback;
+    }
+
+    return calculatedSize;
+  } catch (error) {
+    console.warn(`Error calculating ${dimension} at index ${index}:`, error);
+
+    return fallback;
+  }
 };
 
 /**
@@ -82,10 +136,9 @@ export const createCellStyle = (
           firstVisibleColumn
         );
 
-  const height =
-    typeof rowHeight === "number" ? rowHeight : rowHeight(rowIndex);
-  const width =
-    typeof columnWidth === "number" ? columnWidth : columnWidth(columnIndex);
+  // Safely calculate height and width using the extracted function
+  const height = calculateSafeSize(rowHeight, rowIndex, 50, "height");
+  const width = calculateSafeSize(columnWidth, columnIndex, 100, "width");
 
   return {
     position: "absolute",
