@@ -10,8 +10,15 @@ import { VirtualizerProps } from "../types/virtualization.types";
  * cells that are currently visible in the viewport, significantly improving
  * performance for large grids.
  *
+ * Key Features:
+ * - **Automatic Scroll Management**: Handles scroll position correction when grid dimensions change
+ * - **Overscan Support**: Renders extra cells outside viewport for smoother scrolling
+ * - **Performance Optimized**: Uses React.memo with custom comparison for efficient re-renders
+ * - **Error Resilient**: Includes error boundaries and fallback handling
+ * - **Internal State Management**: All scroll logic is encapsulated within the component
+ *
  * @param props - The virtualizer configuration props
- * @returns A memoized virtualized grid component
+ * @returns A memoized virtualized grid component with automatic scroll management
  *
  * @example
  * ```tsx
@@ -22,6 +29,8 @@ import { VirtualizerProps } from "../types/virtualization.types";
  *   columnWidth={100}
  *   containerHeight={400}
  *   containerWidth={400}
+ *   overscanRowCount={5}
+ *   overscanColumnCount={3}
  * >
  *   {({ rowIndex, columnIndex, style }) => (
  *     <div style={style}>
@@ -41,10 +50,12 @@ export const Virtualizer = React.memo<VirtualizerProps>(props => {
     containerWidth,
     scrollOffsetY,
     scrollOffsetX,
+    scrollContainerRef,
   } = useVirtualization(props);
 
   return (
     <div
+      ref={scrollContainerRef}
       style={{
         height: containerHeight,
         width: containerWidth,

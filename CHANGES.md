@@ -97,3 +97,7 @@ It will take some time to think through and implement so im keeping the current 
 2. **No Loading States**: No handling for dynamic content loading
 3. **Metrics**: For debuging puproses it would be good to see metrics of number of rendered cells / time it took to render cell etc.
 4. **Unit Tests**: Add Unit tests for most important features 
+
+## Logic fixes
+
+1. There was an issue where after updating row/col number value the scroll was not adjusting its position. 

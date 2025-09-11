@@ -93,6 +93,7 @@ export interface UseVirtualizationReturn {
   containerWidth: number;
   scrollOffsetY: number;
   scrollOffsetX: number;
+  scrollContainerRef: React.RefObject<HTMLDivElement>;
 }
 
 /** Manages visible range state and scroll handling. */

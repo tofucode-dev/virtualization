@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 import {
   VisibleRange,
@@ -8,9 +8,17 @@ import {
 /**
  * Custom hook that manages the visible range of cells in the virtualized grid.
  *
- * Calculates which rows and columns are currently visible based on scroll position
- * and provides optimized scroll handling to update the visible range efficiently.
- * Includes overscan support for smoother scrolling by rendering extra cells outside the viewport.
+ * This hook handles two main responsibilities:
+ * 1. **Visible Range Calculation**: Determines which rows and columns are currently visible
+ *    based on scroll position and container dimensions
+ * 2. **Scroll Position Management**: Automatically corrects invalid scroll positions when
+ *    grid dimensions change to prevent showing empty space
+ *
+ * Features:
+ * - **Overscan Support**: Renders extra cells outside the viewport for smoother scrolling
+ * - **Automatic Range Updates**: Recalculates visible range when grid dimensions change
+ * - **Scroll Position Correction**: Ensures scroll position stays within valid bounds
+ * - **Performance Optimized**: Uses focused useEffect hooks for efficient updates
  *
  * @param containerHeight - The height of the container viewport
  * @param containerWidth - The width of the container viewport
@@ -20,6 +28,7 @@ import {
  * @param avgColumnWidth - The average width of a column (for position calculations)
  * @param overscanRowCount - Number of extra rows to render outside the visible area
  * @param overscanColumnCount - Number of extra columns to render outside the visible area
+ * @param scrollContainerRef - Ref to the scroll container for position management
  * @returns Visible range manager with current range, setter, and scroll handler
  */
 export const useVisibleRange = (
@@ -30,7 +39,8 @@ export const useVisibleRange = (
   avgRowHeight: number,
   avgColumnWidth: number,
   overscanRowCount: number,
-  overscanColumnCount: number
+  overscanColumnCount: number,
+  scrollContainerRef: React.RefObject<HTMLDivElement>
 ): VisibleRangeManager => {
   const [range, setRange] = useState<VisibleRange>(() => {
     const visibleRows = Math.floor(containerHeight / avgRowHeight) + 1;
@@ -46,6 +56,88 @@ export const useVisibleRange = (
       ),
     };
   });
+
+  // Recalculate visible range when grid dimensions change
+  useEffect(() => {
+    if (scrollContainerRef.current) {
+      const { scrollTop, scrollLeft } = scrollContainerRef.current;
+
+      // Calculate visible range based on current scroll position
+      const firstVisibleRow = Math.floor(scrollTop / avgRowHeight);
+      const lastVisibleRow = Math.floor(
+        (scrollTop + containerHeight) / avgRowHeight
+      );
+      const firstVisibleColumn = Math.floor(scrollLeft / avgColumnWidth);
+      const lastVisibleColumn = Math.floor(
+        (scrollLeft + containerWidth) / avgColumnWidth
+      );
+
+      // Apply overscan with bounds checking
+      setRange({
+        firstRow: Math.max(0, firstVisibleRow - overscanRowCount),
+        lastRow: Math.min(numRows - 1, lastVisibleRow + overscanRowCount),
+        firstColumn: Math.max(0, firstVisibleColumn - overscanColumnCount),
+        lastColumn: Math.min(
+          numColumns - 1,
+          lastVisibleColumn + overscanColumnCount
+        ),
+      });
+    }
+  }, [
+    containerHeight,
+    containerWidth,
+    avgRowHeight,
+    avgColumnWidth,
+    numRows,
+    numColumns,
+    overscanRowCount,
+    overscanColumnCount,
+    scrollContainerRef,
+  ]);
+
+  // Correct scroll position when grid dimensions change
+  useEffect(() => {
+    if (scrollContainerRef.current) {
+      const maxScrollTop = Math.max(
+        0,
+        numRows * avgRowHeight - containerHeight
+      );
+      const maxScrollLeft = Math.max(
+        0,
+        numColumns * avgColumnWidth - containerWidth
+      );
+
+      const currentScrollTop = scrollContainerRef.current.scrollTop;
+      const currentScrollLeft = scrollContainerRef.current.scrollLeft;
+
+      // Clamp scroll position to valid bounds
+      const newScrollTop = Math.min(
+        Math.max(0, currentScrollTop),
+        maxScrollTop
+      );
+      const newScrollLeft = Math.min(
+        Math.max(0, currentScrollLeft),
+        maxScrollLeft
+      );
+
+      // Update scroll position if it changed
+      if (
+        currentScrollTop !== newScrollTop ||
+        currentScrollLeft !== newScrollLeft
+      ) {
+        scrollContainerRef.current.scrollTop = newScrollTop;
+        scrollContainerRef.current.scrollLeft = newScrollLeft;
+      }
+    }
+  }, [
+    containerHeight,
+    containerWidth,
+    avgRowHeight,
+    avgColumnWidth,
+    numRows,
+    numColumns,
+    scrollContainerRef,
+  ]);
 
   const onScroll = useCallback<React.UIEventHandler<HTMLDivElement>>(
     ({ currentTarget }) => {

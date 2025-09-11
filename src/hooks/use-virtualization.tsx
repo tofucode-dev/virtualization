@@ -1,3 +1,5 @@
+import { useRef } from "react";
+
 import type {
   UseVirtualizationReturn,
   VirtualizerProps,
@@ -11,29 +13,43 @@ import { useVisibleRange } from "./use-visible-range";
  * Main virtualization hook that orchestrates all virtualization concerns.
  *
  * This hook composes smaller, focused hooks to provide a clean API:
- * - useValidatedProps: Validates and normalizes input props
- * - useVirtualizationDimensions: Calculates total and average dimensions
- * - useVisibleRange: Manages visible row/column state and scroll handling
- * - useRenderCells: Renders only visible cells efficiently
+ * - **useValidatedProps**: Validates and normalizes input props with fallback values
+ * - **useVirtualizationDimensions**: Calculates total and average dimensions for the grid
+ * - **useVisibleRange**: Manages visible row/column state and scroll position correction
+ * - **useRenderCells**: Renders only visible cells efficiently with memoized styles
+ *
+ * Key Features:
+ * - **Automatic Scroll Correction**: Handles invalid scroll positions when grid dimensions change
+ * - **Overscan Support**: Renders extra cells outside viewport for smoother scrolling
+ * - **Performance Optimized**: Uses focused useEffect hooks and memoization
+ * - **Error Resilient**: Includes error boundaries and fallback handling
  *
  * This composition approach provides:
- * - Better testability (each concern can be tested in isolation)
- * - Better maintainability (single responsibility per hook)
- * - Better reusability (individual hooks can be used elsewhere)
- * - Better performance (fine-grained memoization)
+ * - **Better Testability**: Each concern can be tested in isolation
+ * - **Better Maintainability**: Single responsibility per hook
+ * - **Better Reusability**: Individual hooks can be used elsewhere
+ * - **Better Performance**: Fine-grained memoization and optimized re-renders
  *
  * @param props - The virtualizer configuration props
  * @returns An object containing all necessary values and functions for virtualization
  *
  * @example
  * ```tsx
- * const { onScroll, totalHeight, totalWidth, renderCells } = useVirtualization({
+ * const {
+ *   onScroll,
+ *   totalHeight,
+ *   totalWidth,
+ *   renderCells,
+ *   scrollContainerRef
+ * } = useVirtualization({
  *   numRows: 1000,
  *   numColumns: 1000,
  *   rowHeight: 50,
  *   columnWidth: 100,
  *   containerHeight: 400,
  *   containerWidth: 400,
+ *   overscanRowCount: 5,
+ *   overscanColumnCount: 3,
  *   children: ({ rowIndex, columnIndex, style }) => (
  *     <div style={style}>Cell {rowIndex}:{columnIndex}</div>
  *   )
@@ -43,6 +59,9 @@ import { useVisibleRange } from "./use-visible-range";
 export const useVirtualization = (
   props: VirtualizerProps
 ): UseVirtualizationReturn => {
+  // Create internal ref for scroll container
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+
   // 1. Validate and normalize all input props
   const validatedProps = useValidatedProps(props);
 
@@ -63,7 +82,8 @@ export const useVirtualization = (
     dimensions.avgRowHeight,
     dimensions.avgColumnWidth,
     validatedProps.overscanRowCount,
-    validatedProps.overscanColumnCount
+    validatedProps.overscanColumnCount,
+    scrollContainerRef
   );
 
   // 4. Create cell rendering function
@@ -94,5 +114,6 @@ export const useVirtualization = (
     containerWidth: validatedProps.containerWidth,
     scrollOffsetY,
     scrollOffsetX,
+    scrollContainerRef,
   };
 };
