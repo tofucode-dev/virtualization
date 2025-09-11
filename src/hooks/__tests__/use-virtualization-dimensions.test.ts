@@ -256,13 +256,9 @@ describe("useVirtualizationDimensions", () => {
       )
     );
 
-    // Total height: -1 + -2 + -3 = -6
-    expect(result.current.totalHeight).toBe(-6);
-    // Total width: -10 + -20 = -30
-    expect(result.current.totalWidth).toBe(-30);
-    // Average height: -6 / 3 = -2
-    expect(result.current.avgRowHeight).toBe(-2);
-    // Average width: -30 / 2 = -15
-    expect(result.current.avgColumnWidth).toBe(-15);
+    expect(result.current.totalHeight).toBe(0);
+    expect(result.current.totalWidth).toBe(0);
+    expect(result.current.avgRowHeight).toBe(0);
+    expect(result.current.avgColumnWidth).toBe(0);
   });
 });

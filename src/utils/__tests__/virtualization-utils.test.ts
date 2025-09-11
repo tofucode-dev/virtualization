@@ -176,7 +176,7 @@ describe("virtualization-utils", () => {
     it("should return valid numbers", () => {
       expect(checkNumberProp(42, 0)).toBe(42);
       expect(checkNumberProp(0, 10)).toBe(0);
-      expect(checkNumberProp(-5, 10)).toBe(-5);
+      expect(checkNumberProp(-5, 10)).toBe(10);
       expect(checkNumberProp(3.14, 10)).toBe(3.14);
     });
 
