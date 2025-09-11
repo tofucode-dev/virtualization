@@ -1,10 +1,10 @@
-import React, { useCallback, useState } from "react";
+import { useCallback, useState } from "react";
 
 import styled from "styled-components";
 
-import { TextField } from "./TextField";
 import { Virtualizer } from "./component-library";
-import { CellInfo } from "./types/virtualization.types";
+import { VirtualizerForm } from "./component-library/VirtualizerForm";
+import { CellInfo, VirtualizerFormData } from "./types/virtualization.types";
 
 const Container = styled.div`
   min-height: 100vh;
@@ -16,53 +16,21 @@ const Container = styled.div`
   justify-content: center;
 `;
 
-const ParametersContainer = styled.div`
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  grid-gap: 8px;
-  margin-bottom: 8px;
-`;
-
-const useNumberParameter = (
-  initialValue: number
-): [
-  string,
-  number,
-  React.ChangeEventHandler<HTMLInputElement | HTMLTextAreaElement>,
-] => {
-  const [input, setInput] = useState(initialValue.toString());
-  const [param, setParam] = useState(initialValue);
-  const onChangeParam = useCallback<
-    React.ChangeEventHandler<HTMLInputElement | HTMLTextAreaElement>
-  >(({ target: { value } }) => {
-    if (/^\d*$/.test(value)) {
-      setInput(value);
-      if (value) {
-        setParam(Number(value));
-      }
-    }
-  }, []);
-
-  return [input, param, onChangeParam];
-};
-
 const App = () => {
-  const [numRowsInput, numRows, onChangeNumRows] = useNumberParameter(5);
-  const [numColsInput, numCols, onChangeNumCols] = useNumberParameter(5);
-  const [rowHeightInput, rowHeight, onChangeRowHeight] = useNumberParameter(50);
-  const [columnWidthInput, columnWidth, onChangeColumnWidth] =
-    useNumberParameter(100);
-  const [containerHeightInput, containerHeight, onChangeContainerHeight] =
-    useNumberParameter(400);
-  const [containerWidthInput, containerWidth, onChangeContainerWidth] =
-    useNumberParameter(400);
-  const [overscanRowCountInput, overscanRowCount, onChangeOverscanRowCount] =
-    useNumberParameter(1);
-  const [
-    overscanColumnCountInput,
-    overscanColumnCount,
-    onChangeOverscanColumnCount,
-  ] = useNumberParameter(1);
+  const [formData, setFormData] = useState<VirtualizerFormData>({
+    numRows: 5,
+    numCols: 5,
+    rowHeight: 50,
+    columnWidth: 100,
+    containerHeight: 400,
+    containerWidth: 400,
+    overscanRowCount: 1,
+    overscanColumnCount: 1,
+  });
+
+  const handleParametersChange = useCallback((data: VirtualizerFormData) => {
+    setFormData(data);
+  }, []);
 
   const [reset, setReset] = useState(false);
 
@@ -107,57 +75,16 @@ const App = () => {
       >
         {reset ? "!Force Render" : "Force Render!"}
       </button>
-      <ParametersContainer>
-        <TextField
-          label="Num Rows"
-          value={numRowsInput}
-          onChange={onChangeNumRows}
-        />
-        <TextField
-          label="Num Columns"
-          value={numColsInput}
-          onChange={onChangeNumCols}
-        />
-        <TextField
-          label="Row Height"
-          value={rowHeightInput}
-          onChange={onChangeRowHeight}
-        />
-        <TextField
-          label="Column Width"
-          value={columnWidthInput}
-          onChange={onChangeColumnWidth}
-        />
-        <TextField
-          label="Container Height"
-          value={containerHeightInput}
-          onChange={onChangeContainerHeight}
-        />
-        <TextField
-          label="Container Width"
-          value={containerWidthInput}
-          onChange={onChangeContainerWidth}
-        />
-        <TextField
-          label="Overscan Rows"
-          value={overscanRowCountInput}
-          onChange={onChangeOverscanRowCount}
-        />
-        <TextField
-          label="Overscan Columns"
-          value={overscanColumnCountInput}
-          onChange={onChangeOverscanColumnCount}
-        />
-      </ParametersContainer>
+      <VirtualizerForm onParametersChange={handleParametersChange} initialData={formData} />
       <Virtualizer
-        numRows={numRows}
-        numColumns={numCols}
-        rowHeight={rowHeight}
-        columnWidth={columnWidth}
-        containerHeight={containerHeight}
-        containerWidth={containerWidth}
-        overscanRowCount={overscanRowCount}
-        overscanColumnCount={overscanColumnCount}
+        numRows={formData.numRows}
+        numColumns={formData.numCols}
+        rowHeight={formData.rowHeight}
+        columnWidth={formData.columnWidth}
+        containerHeight={formData.containerHeight}
+        containerWidth={formData.containerWidth}
+        overscanRowCount={formData.overscanRowCount}
+        overscanColumnCount={formData.overscanColumnCount}
       >
         {renderCell}
       </Virtualizer>

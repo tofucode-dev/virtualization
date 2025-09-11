@@ -120,3 +120,26 @@ export interface CellCoordinates {
   rowIndex: number;
   columnIndex: number;
 }
+
+
+export interface VirtualizerFormData {
+  numRows: number;
+  numCols: number;
+  rowHeight: number;
+  columnWidth: number;
+  containerHeight: number;
+  containerWidth: number;
+  overscanRowCount: number;
+  overscanColumnCount: number;
+}
+
+export interface VirtualizerFormProps {
+  initialData: VirtualizerFormData;
+  onParametersChange: (data: VirtualizerFormData) => void;
+}
+
+export interface TextFieldProps {
+  label: string;
+  value: string;
+  onChange: React.ChangeEventHandler<HTMLInputElement>;
+}
