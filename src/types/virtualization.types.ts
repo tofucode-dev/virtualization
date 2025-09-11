@@ -83,6 +83,8 @@ export interface UseVirtualizationReturn {
   renderCells: () => React.ReactNode[];
   containerHeight: number;
   containerWidth: number;
+  scrollOffsetY: number;
+  scrollOffsetX: number;
 }
 
 /** Manages visible range state and scroll handling. */

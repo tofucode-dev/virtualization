@@ -72,6 +72,17 @@ export const useVirtualization = (
     validatedProps.children
   );
 
+  // Calculate scroll offsets for viewport compensation (no virtual scrolling)
+  const scrollOffsetY =
+    typeof validatedProps.rowHeight === "number"
+      ? visibleRangeManager.range.firstRow * validatedProps.rowHeight
+      : 0;
+
+  const scrollOffsetX =
+    typeof validatedProps.columnWidth === "number"
+      ? visibleRangeManager.range.firstColumn * validatedProps.columnWidth
+      : 0;
+
   return {
     onScroll: visibleRangeManager.onScroll,
     totalHeight: dimensions.totalHeight,
@@ -79,5 +90,7 @@ export const useVirtualization = (
     renderCells,
     containerHeight: validatedProps.containerHeight,
     containerWidth: validatedProps.containerWidth,
+    scrollOffsetY,
+    scrollOffsetX,
   };
 };

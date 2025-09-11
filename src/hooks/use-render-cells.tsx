@@ -31,9 +31,12 @@ export const useRenderCells = (
         columnIndex <= range.lastColumn;
         columnIndex++
       ) {
+        // Use viewport-relative positioning to eliminate browser limits
         const style = createCellStyle(
           rowIndex,
           columnIndex,
+          range.firstRow,
+          range.firstColumn,
           rowHeight,
           columnWidth
         );

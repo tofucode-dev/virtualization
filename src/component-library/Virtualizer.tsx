@@ -34,11 +34,13 @@ import { VirtualizerProps } from "../types/virtualization.types";
 export const Virtualizer = React.memo<VirtualizerProps>(props => {
   const {
     onScroll,
+    renderCells,
     totalHeight,
     totalWidth,
-    renderCells,
     containerHeight,
     containerWidth,
+    scrollOffsetY,
+    scrollOffsetX,
   } = useVirtualization(props);
 
   return (
@@ -58,7 +60,18 @@ export const Virtualizer = React.memo<VirtualizerProps>(props => {
           overflow: "hidden",
         }}
       >
-        {renderCells()}
+        <div
+          style={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            // Translate the content to show the correct "window" of cells
+            // This compensates for the viewport-relative positioning
+            transform: `translate(${scrollOffsetX}px, ${scrollOffsetY}px)`,
+          }}
+        >
+          {renderCells()}
+        </div>
       </div>
     </div>
   );
