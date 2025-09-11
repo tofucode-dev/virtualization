@@ -10,6 +10,7 @@ import {
  *
  * Calculates which rows and columns are currently visible based on scroll position
  * and provides optimized scroll handling to update the visible range efficiently.
+ * Includes overscan support for smoother scrolling by rendering extra cells outside the viewport.
  *
  * @param containerHeight - The height of the container viewport
  * @param containerWidth - The width of the container viewport
@@ -17,6 +18,8 @@ import {
  * @param numColumns - The total number of columns in the grid
  * @param avgRowHeight - The average height of a row (for position calculations)
  * @param avgColumnWidth - The average width of a column (for position calculations)
+ * @param overscanRowCount - Number of extra rows to render outside the visible area
+ * @param overscanColumnCount - Number of extra columns to render outside the visible area
  * @returns Visible range manager with current range, setter, and scroll handler
  */
 export const useVisibleRange = (
@@ -25,35 +28,47 @@ export const useVisibleRange = (
   numRows: number,
   numColumns: number,
   avgRowHeight: number,
-  avgColumnWidth: number
+  avgColumnWidth: number,
+  overscanRowCount: number,
+  overscanColumnCount: number
 ): VisibleRangeManager => {
-  const [range, setRange] = useState<VisibleRange>(() => ({
-    firstRow: 0,
-    lastRow: Math.min(
-      Math.floor(containerHeight / avgRowHeight) + 1,
-      numRows - 1
-    ),
-    firstColumn: 0,
-    lastColumn: Math.min(
-      Math.floor(containerWidth / avgColumnWidth) + 1,
-      numColumns - 1
-    ),
-  }));
+  const [range, setRange] = useState<VisibleRange>(() => {
+    const visibleRows = Math.floor(containerHeight / avgRowHeight) + 1;
+    const visibleColumns = Math.floor(containerWidth / avgColumnWidth) + 1;
+
+    return {
+      firstRow: Math.max(0, 0 - overscanRowCount),
+      lastRow: Math.min(numRows - 1, visibleRows - 1 + overscanRowCount),
+      firstColumn: Math.max(0, 0 - overscanColumnCount),
+      lastColumn: Math.min(
+        numColumns - 1,
+        visibleColumns - 1 + overscanColumnCount
+      ),
+    };
+  });
 
   const onScroll = useCallback<React.UIEventHandler<HTMLDivElement>>(
     ({ currentTarget }) => {
       const { scrollTop, scrollLeft } = currentTarget;
 
+      // Calculate visible range
+      const firstVisibleRow = Math.floor(scrollTop / avgRowHeight);
+      const lastVisibleRow = Math.floor(
+        (scrollTop + containerHeight) / avgRowHeight
+      );
+      const firstVisibleColumn = Math.floor(scrollLeft / avgColumnWidth);
+      const lastVisibleColumn = Math.floor(
+        (scrollLeft + containerWidth) / avgColumnWidth
+      );
+
+      // Apply overscan
       setRange({
-        firstRow: Math.max(0, Math.floor(scrollTop / avgRowHeight)),
-        lastRow: Math.min(
-          numRows - 1,
-          Math.floor((scrollTop + containerHeight) / avgRowHeight) + 1
-        ),
-        firstColumn: Math.max(0, Math.floor(scrollLeft / avgColumnWidth)),
+        firstRow: Math.max(0, firstVisibleRow - overscanRowCount),
+        lastRow: Math.min(numRows - 1, lastVisibleRow + overscanRowCount),
+        firstColumn: Math.max(0, firstVisibleColumn - overscanColumnCount),
         lastColumn: Math.min(
           numColumns - 1,
-          Math.floor((scrollLeft + containerWidth) / avgColumnWidth) + 1
+          lastVisibleColumn + overscanColumnCount
         ),
       });
     },
@@ -64,6 +79,8 @@ export const useVisibleRange = (
       containerWidth,
       numRows,
       numColumns,
+      overscanRowCount,
+      overscanColumnCount,
     ]
   );
 

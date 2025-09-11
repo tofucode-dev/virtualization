@@ -27,6 +27,8 @@ export const useValidatedProps = (
   const containerHeight = checkNumberProp(props.containerHeight, 0);
   const containerWidth = checkNumberProp(props.containerWidth, 0);
   const children = checkFunctionProp(props.children, () => null);
+  const overscanRowCount = checkNumberProp(props.overscanRowCount, 1);
+  const overscanColumnCount = checkNumberProp(props.overscanColumnCount, 1);
 
   return {
     numRows,
@@ -36,5 +38,7 @@ export const useValidatedProps = (
     containerHeight,
     containerWidth,
     children,
+    overscanRowCount,
+    overscanColumnCount,
   };
 };

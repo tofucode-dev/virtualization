@@ -38,6 +38,10 @@ export interface VirtualizerProps {
   containerHeight: number;
   containerWidth: number;
   children: RenderFunction;
+  /** Number of extra rows to render outside the visible area for smoother scrolling */
+  overscanRowCount: number;
+  /** Number of extra columns to render outside the visible area for smoother scrolling */
+  overscanColumnCount: number;
 }
 
 /** Validated props with guaranteed safe values for virtualization. */
@@ -49,6 +53,8 @@ export interface ValidatedVirtualizerProps {
   containerHeight: number;
   containerWidth: number;
   children: RenderFunction;
+  overscanRowCount: number;
+  overscanColumnCount: number;
 }
 
 // ============================================================================

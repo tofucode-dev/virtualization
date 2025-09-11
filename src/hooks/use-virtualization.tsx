@@ -61,7 +61,9 @@ export const useVirtualization = (
     validatedProps.numRows,
     validatedProps.numColumns,
     dimensions.avgRowHeight,
-    dimensions.avgColumnWidth
+    dimensions.avgColumnWidth,
+    validatedProps.overscanRowCount,
+    validatedProps.overscanColumnCount
   );
 
   // 4. Create cell rendering function

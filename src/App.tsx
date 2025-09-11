@@ -69,6 +69,13 @@ const App = () => {
     useNumberParameter(400);
   const [containerWidthInput, containerWidth, onChangeContainerWidth] =
     useNumberParameter(400);
+  const [overscanRowCountInput, overscanRowCount, onChangeOverscanRowCount] =
+    useNumberParameter(1);
+  const [
+    overscanColumnCountInput,
+    overscanColumnCount,
+    onChangeOverscanColumnCount,
+  ] = useNumberParameter(1);
   const [reset, setReset] = useState(false);
 
   /**
@@ -138,6 +145,16 @@ const App = () => {
           value={containerWidthInput}
           onChange={onChangeContainerWidth}
         />
+        <TextField
+          label="Overscan Rows"
+          value={overscanRowCountInput}
+          onChange={onChangeOverscanRowCount}
+        />
+        <TextField
+          label="Overscan Columns"
+          value={overscanColumnCountInput}
+          onChange={onChangeOverscanColumnCount}
+        />
       </ParametersContainer>
       <Virtualizer
         numRows={numRows}
@@ -146,6 +163,8 @@ const App = () => {
         columnWidth={columnWidth}
         containerHeight={containerHeight}
         containerWidth={containerWidth}
+        overscanRowCount={overscanRowCount}
+        overscanColumnCount={overscanColumnCount}
       >
         {renderCell}
       </Virtualizer>
