@@ -35,7 +35,9 @@ export const useVirtualizationDimensions = (
 
   const avgRowHeight = useMemo(() => {
     return typeof rowHeight === "number"
-      ? rowHeight
+      ? numRows > 0
+        ? rowHeight
+        : 0
       : numRows > 0
         ? totalHeight / numRows
         : 0;
@@ -43,7 +45,9 @@ export const useVirtualizationDimensions = (
 
   const avgColumnWidth = useMemo(() => {
     return typeof columnWidth === "number"
-      ? columnWidth
+      ? numColumns > 0
+        ? columnWidth
+        : 0
       : numColumns > 0
         ? totalWidth / numColumns
         : 0;
