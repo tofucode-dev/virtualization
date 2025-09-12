@@ -103,3 +103,37 @@ It will take some time to think through and implement so im keeping the current 
 
 1. There was an issue where after updating row/col number value the scroll was not adjusting its position. 
 2. Cell definition in App.tsx is using forwardRef while it is not actually used since Cell is just a div.
+
+## TODO
+
+#### 1. Browser Rendering Limits
+
+Critical Issue: Large grids (50k x 50k) hit browser rendering limits (~32M pixels in Chrome)
+Current Problem: Using fixed totalHeight/totalWidth causes browser to stop rendering
+Solution Needed: Implement viewport-relative content generation instead of fixed container sizes
+
+#### 2. Error Boundaries
+
+Add: Error boundaries for graceful failure handling
+Implement: Fallback UI for virtualization errors
+Add: User-friendly error messages
+
+#### 3. Form Validation
+
+Add: Input validation with error messages
+Implement: Min/max value constraints
+Add: Preset configurations (small, medium, large grids)
+Improve: Real-time validation feedback
+
+#### 4. Replace Styled Components
+
+Current: Styled Components (not statically generated)
+Options:
+Tailwind CSS for better performance
+Shadcn/Radix UI components
+
+##### 5. Accessibility
+Add: ARIA labels and roles
+Implement: Keyboard navigation
+Add: Screen reader support
+Ensure: Color contrast compliance
