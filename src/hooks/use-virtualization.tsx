@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { useCallback, useRef } from "react";
 
 import type {
   UseVirtualizationReturn,
@@ -94,6 +94,15 @@ export const useVirtualization = (
     validatedProps.children
   );
 
+  const { onRenderStart, onRenderEnd } = props;
+
+  const performanceRenderCells = useCallback(() => {
+    onRenderStart?.();
+    const cells = renderCells();
+    onRenderEnd?.(cells.length);
+
+    return cells;
+  }, [renderCells, onRenderStart, onRenderEnd]);
   // Calculate scroll offsets for viewport compensation (no virtual scrolling)
   const scrollOffsetY =
     typeof validatedProps.rowHeight === "number"
@@ -109,7 +118,7 @@ export const useVirtualization = (
     onScroll: visibleRangeManager.onScroll,
     totalHeight: dimensions.totalHeight,
     totalWidth: dimensions.totalWidth,
-    renderCells,
+    renderCells: performanceRenderCells,
     containerHeight: validatedProps.containerHeight,
     containerWidth: validatedProps.containerWidth,
     scrollOffsetY,

@@ -42,6 +42,8 @@ export interface VirtualizerProps {
   overscanRowCount: number;
   /** Number of extra columns to render outside the visible area for smoother scrolling */
   overscanColumnCount: number;
+  onRenderStart?: () => void;
+  onRenderEnd?: (cellCount: number) => void;
 }
 
 /** Validated props with guaranteed safe values for virtualization. */
@@ -120,7 +122,6 @@ export interface CellCoordinates {
   rowIndex: number;
   columnIndex: number;
 }
-
 
 export interface VirtualizerFormData {
   numRows: number;
